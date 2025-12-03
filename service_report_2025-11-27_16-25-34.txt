@@ -1,0 +1,40 @@
+# Customer Service Report - Saudi Electric Company
+Date: 2025-11-27 16:24
+
+## Request Summary
+- Request type: Billing inquiry
+- Priority: Normal
+- Status: Information Compiled - Guidance Provided
+
+## Details
+
+### Information provided by departments
+
+| Department | Key Information Provided |
+| :--- | :--- |
+| **Billing/Customer Service** | Detailed explanation of the Saudi Progressive Tariff Structure (0.18 SAR/kWh for consumption up to 4,000 kWh, and 0.30 SAR/kWh for consumption above 4,000 kWh). Provided example calculation showing how crossing the 4,000 kWh threshold significantly impacts the total bill amount. Offered general energy-saving tips and available payment methods. |
+| **Technical** | Diagnosis focused on three potential causes for high bill: high customer consumption, administrative reading error, or utility meter malfunction (assessed as Low Severity). Determined that a technician visit is *not* immediately required. |
+
+### Proposed solutions
+The primary proposed solution is consumption reduction and verification by the customer, as high usage is the most common cause.
+1.  **Usage Verification:** The customer must provide the account number for a personalized review of the specific bill, meter readings, and billing cycles.
+2.  **Energy Management:** Implement energy-saving measures, particularly setting A/C thermostats to 24°C, utilizing efficient LED lighting, and ensuring home insulation is adequate.
+3.  **Basic Technical Checks:** The customer should compare the current meter reading against the bill and perform a 'phantom load' check (turning off all appliances and checking the meter for continued rapid movement).
+
+### Actions taken
+A comprehensive explanation of the progressive tariff structure was provided to the customer, along with specific diagnostic steps to rule out administrative or technical errors. The complaint has been officially logged under the assigned department (Billing Department) pending the receipt of the customer's account details.
+
+## Follow-up Steps
+
+- What the customer should do:
+    1.  Provide the specific **Account Number** to the Customer Service Coordinator immediately to facilitate a detailed, unit-by-unit analysis of the current statement.
+    2.  Review recent usage and consumption patterns.
+    3.  Perform the technical checks outlined (comparing meter reading to bill and checking for phantom consumption).
+    4.  If, after performing checks, a strong suspicion of meter malfunction remains, contact support for a technical escalation.
+- Follow-up numbers: Use the general technical support number provided below for service-related inquiries, or respond to the email thread for account-specific queries.
+- Expected resolution time: Personalized billing dispute resolution (once the account number is provided) typically takes 2-5 business days. If a meter replacement is escalated and necessary, the replacement and calibration process is estimated at approximately 2 hours, pending scheduling.
+
+## Contact Information
+- Technical Support Number: 920000222
+- Website: www.se.com.sa
+- App: Saudi Electric Company App

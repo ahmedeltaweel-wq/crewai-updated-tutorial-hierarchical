@@ -11,7 +11,3 @@ available_models.txt
 whatsapp_*.py
 whatsapp_handler.js
 package*.json
-
-# Service Account Keys (security)
-*-service-account-*.json
-service-account-key.json

@@ -1,0 +1,34 @@
+# Customer Service Report - Saudi Electric Company
+Date: 2025-11-28 16:34 (Using template placeholder date/time)
+
+## Request Summary
+- Request type: Billing inquiry (Discrepancy: Bill increased from ~500 SAR average to 3500 SAR)
+- Priority: Normal (Severity Level High based on financial impact)
+- Status: Investigation Ongoing - Site Visit Scheduled
+
+## Details
+- Information provided by each department:
+    - **Billing Specialist Team:** Provided initial context, confirming the massive deviation from historical consumption and the customer's reported absence during the billing cycle.
+    - **Technical Services (Diagnosis):** Identified the sudden 7x consumption increase, confirming that the high bill likely stems from a non-consumption-related fault (Administrative Error, Metering Fault, or Internal Load Fault).
+    - **System Review (MDAS Check):** Confirmed the smart meter was communicating correctly, and the Meter Data Acquisition System logs validated that the charged consumption (approx. 8,500 kWh) was accurately recorded by the meter.
+    - **Administrative Review:** Confirmed that the bill was based on an **Actual reading**, and that the correct tariff structure was applied without any clerical or systemic administrative errors.
+- Proposed solutions:
+    1. Customer instructed to record current meter reading and take photographs for immediate cross-reference.
+    2. Mandatory on-site technician visit scheduled to physically verify the meter, confirm its serial number, check for visible faults, and investigate potential high-consumption internal loads.
+- Actions taken:
+    1. Remote Data Retrieval (MDAS Check) completed, validating the consumption data integrity.
+    2. Administrative Review completed, ruling out billing system or clerical errors.
+    3. Technician site visit has been scheduled.
+
+## Follow-up Steps
+- What the customer should do:
+    1. Ensure clear and safe access to the meter for the technician on the scheduled date.
+    2. Monitor the meter area for excessive heat, buzzing noises, or burning smells. If observed, immediately switch off the main breaker.
+    3. Prepare to discuss any recent changes to large appliance usage or the property's electrical load history with the attending technician.
+- Follow-up numbers: Please refer to the Technical Support Number below for scheduling or urgent concerns.
+- Expected resolution time: **3 to 7 business days** (This timeframe includes technician scheduling, on-site diagnosis/testing, and subsequent administrative processing or physical repair/replacement if a fault is confirmed).
+
+## Contact Information
+- Technical Support Number: 920000222
+- Website: www.se.com.sa
+- App: Saudi Electric Company App

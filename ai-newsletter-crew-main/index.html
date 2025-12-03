@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Newsletter Crew - Live Dashboard</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.5; }
+            50% { transform: translateX(-50%) scale(1.1); opacity: 0.8; }
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .start-button {
+            width: 100%;
+            padding: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .start-button:hover::before {
+            left: 100%;
+        }
+
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.5);
+        }
+
+        .start-button:disabled {
+            background: var(--bg-card-hover);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .start-button:disabled:hover {
+            transform: none;
+        }
+
+        /* Agents Grid */
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .agent-card.working::before {
+            transform: scaleX(1);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .agent-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
+        }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .agent-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .agent-info h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .agent-status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-idle {
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .status-working {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+            animation: pulse-status 2s infinite;
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        @keyframes pulse-status {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .agent-message {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin: 1rem 0;
+            min-height: 3rem;
+            line-height: 1.5;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-dark);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+
+        /* Results Section */
+        .results-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .results-content {
+            background: var(--bg-dark);
+            padding: 1.5rem;
+            border-radius: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Status Indicator */
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 1rem 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .status-dot.disconnected {
+            background: var(--error);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .agents-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="status-indicator">
+        <div class="status-dot" id="connectionDot"></div>
+        <span id="connectionStatus">متصل</span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Newsletter Crew</h1>
+            <p>مراقبة عمل الوكلاء الذكيين في الوقت الفعلي</p>
+        </div>
+
+        <div class="control-panel">
+            <button class="start-button" id="startButton" onclick="startCrew()">
+                🚀 ابدأ إنشاء النشرة الإخبارية
+            </button>
+        </div>
+
+        <div class="agents-grid">
+            <div class="agent-card" id="agent-editor">
+                <div class="agent-header">
+                    <div class="agent-icon">📝</div>
+                    <div class="agent-info">
+                        <h3>المحرر</h3>
+                        <span class="agent-status status-idle" id="status-editor">خامل</span>
+                    </div>
+                </div>
+                <div class="agent-message" id="message-editor">في انتظار البدء...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-editor" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="agent-card" id="agent-news_fetcher">
+                <div class="agent-header">
+                    <div class="agent-icon">🔍</div>
+                    <div class="agent-info">
+                        <h3>جامع الأخبار</h3>
+                        <span class="agent-status status-idle" id="status-news_fetcher">خامل</span>
+                    </div>
+                </div>
+                <div class="agent-message" id="message-news_fetcher">في انتظار البدء...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-news_fetcher" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="agent-card" id="agent-news_analyzer">
+                <div class="agent-header">
+                    <div class="agent-icon">🧠</div>
+                    <div class="agent-info">
+                        <h3>محلل الأخبار</h3>
+                        <span class="agent-status status-idle" id="status-news_analyzer">خامل</span>
+                    </div>
+                </div>
+                <div class="agent-message" id="message-news_analyzer">في انتظار البدء...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-news_analyzer" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="agent-card" id="agent-newsletter_compiler">
+                <div class="agent-header">
+                    <div class="agent-icon">📰</div>
+                    <div class="agent-info">
+                        <h3>مجمّع النشرة</h3>
+                        <span class="agent-status status-idle" id="status-newsletter_compiler">خامل</span>
+                    </div>
+                </div>
+                <div class="agent-message" id="message-newsletter_compiler">في انتظار البدء...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-newsletter_compiler" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <h2>✨ النتائج النهائية</h2>
+            <div class="results-content" id="resultsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        let isRunning = false;
+
+        // Connection status
+        socket.on('connect', () => {
+            document.getElementById('connectionDot').classList.remove('disconnected');
+            document.getElementById('connectionStatus').textContent = 'متصل';
+        });
+
+        socket.on('disconnect', () => {
+            document.getElementById('connectionDot').classList.add('disconnected');
+            document.getElementById('connectionStatus').textContent = 'غير متصل';
+        });
+
+        // Agent updates
+        socket.on('agent_update', (data) => {
+            updateAgentUI(data.agent, data.status, data.message, data.progress);
+        });
+
+        // Workflow events
+        socket.on('workflow_started', (data) => {
+            console.log('Workflow started:', data.message);
+            isRunning = true;
+            updateStartButton();
+        });
+
+        socket.on('workflow_starting', (data) => {
+            console.log('Workflow starting:', data.message);
+        });
+
+        socket.on('workflow_completed', (data) => {
+            console.log('Workflow completed!');
+            isRunning = false;
+            updateStartButton();
+            showResults(data.results);
+        });
+
+        socket.on('workflow_error', (data) => {
+            console.error('Workflow error:', data.error);
+            isRunning = false;
+            updateStartButton();
+            alert('حدث خطأ: ' + data.error);
+        });
+
+        function updateAgentUI(agentName, status, message, progress) {
+            const card = document.getElementById(`agent-${agentName}`);
+            const statusEl = document.getElementById(`status-${agentName}`);
+            const messageEl = document.getElementById(`message-${agentName}`);
+            const progressEl = document.getElementById(`progress-${agentName}`);
+
+            if (!card || !statusEl || !messageEl || !progressEl) return;
+
+            // Update status
+            statusEl.className = `agent-status status-${status}`;
+            const statusText = {
+                'idle': 'خامل',
+                'working': 'يعمل',
+                'completed': 'مكتمل',
+                'error': 'خطأ'
+            };
+            statusEl.textContent = statusText[status] || status;
+
+            // Update message
+            messageEl.textContent = message;
+
+            // Update progress
+            progressEl.style.width = progress + '%';
+
+            // Update card class
+            card.className = 'agent-card';
+            if (status === 'working') {
+                card.classList.add('working');
+            }
+        }
+
+        function startCrew() {
+            if (!isRunning) {
+                socket.emit('start_crew');
+                document.getElementById('resultsSection').classList.remove('show');
+            }
+        }
+
+        function updateStartButton() {
+            const button = document.getElementById('startButton');
+            if (isRunning) {
+                button.disabled = true;
+                button.textContent = '⏳ جاري العمل...';
+            } else {
+                button.disabled = false;
+                button.textContent = '🚀 ابدأ إنشاء النشرة الإخبارية';
+            }
+        }
+
+        function showResults(results) {
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            resultsContent.textContent = results;
+            resultsSection.classList.add('show');
+        }
+
+        // Initial connection
+        socket.on('connected', (data) => {
+            console.log('Connected to server');
+            if (data.agents) {
+                Object.keys(data.agents).forEach(agentName => {
+                    const agent = data.agents[agentName];
+                    updateAgentUI(agentName, agent.status, agent.message, agent.progress);
+                });
+            }
+            isRunning = data.running;
+            updateStartButton();
+        });
+    </script>
+</body>
+</html>

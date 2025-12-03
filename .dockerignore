@@ -1,0 +1,26 @@
+# .dockerignore - Files to exclude from Docker build
+
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.log
+.git
+.gitignore
+*.bat
+*.md
+!README.md
+!company_knowledge.md
+.wwebjs_auth/
+.wwebjs_cache/
+node_modules/
+whatsapp_*.py
+whatsapp_handler.js
+package*.json
+get_models.py
+available_models.txt
+TEST_BOT.bat
+START_TELEGRAM.bat
+KILL_BOT.bat

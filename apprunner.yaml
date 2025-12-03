@@ -1,0 +1,18 @@
+version: 1.0
+runtime: python311
+build:
+  commands:
+    build:
+      - python3 -m pip install --upgrade pip
+      - python3 -m pip install -r requirements.txt
+run:
+  command: python3 telegram_bot.py
+  network:
+    port: 8080
+  env:
+    - name: TELEGRAM_BOT_TOKEN
+      value: "8529682573:AAEiqj1ujm3peulewO_n8KYtaDje_0c1ZAE"
+    - name: GEMINI_API_KEY
+      value: "AIzaSyBXiQVCJsln1_0EKQ2z2zOkkCLSvWm4XCE"
+    - name: PORT
+      value: "8080"
