@@ -9,6 +9,7 @@ COPY requirements.txt .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install gunicorn
 
 # Copy application files
 COPY electric_web_app.py .
@@ -30,5 +31,5 @@ ENV FLASK_APP=electric_web_app.py
 ENV PORT=8080
 ENV PYTHONPATH=/app
 
-# Run the application
-CMD ["python", "electric_web_app.py"]
+# Run the application with gunicorn and eventlet worker
+CMD exec gunicorn --bind :$PORT --workers 1 --worker-class eventlet --timeout 120 electric_web_app:app
