@@ -86,24 +86,53 @@ def run_crew_workflow():
         # Initialize the Google Gemini language model using native CrewAI LLM
         update_agent_status('editor', 'working', 'Connecting to Google Gemini...', 20)
         
-        # FIX: Support both API Key and Vertex AI
+        # FIX: Support both API Key and Vertex AI with fallback
         api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
-        use_vertex_ai = os.environ.get("USE_VERTEX_AI", "false").lower() == "true"
+        use_vertex = os.environ.get("USE_VERTEX_AI", "true").lower() == "true"
         
-        if api_key and not use_vertex_ai:
-            print("🔑 Using Gemini API Key")
+        gemini_llm = None
+        
+        if use_vertex or not api_key:
+            print("☁️ Using Google Cloud Vertex AI (Service Account)")
+            project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "eg-konecta-sandbox")
+            location = os.environ.get("VERTEX_AI_LOCATION", "us-central1")
+            
+            # Try multiple models in order of preference
+            vertex_models = [
+                "vertex_ai/gemini-1.5-flash-001",
+                "vertex_ai/gemini-1.5-flash",
+                "vertex_ai/gemini-1.5-pro-001",
+                "vertex_ai/gemini-1.5-pro",
+                "vertex_ai/gemini-1.0-pro-001",
+                "vertex_ai/gemini-1.0-pro",
+                "vertex_ai/gemini-pro",
+            ]
+            
+            for model_name in vertex_models:
+                try:
+                    print(f"🔄 Trying model: {model_name}")
+                    gemini_llm = LLM(
+                        model=model_name,
+                        project_id=project_id,
+                        location=location
+                    )
+                    print(f"✅ Model {model_name} initialized successfully!")
+                    break
+                except Exception as e:
+                    print(f"❌ Model {model_name} failed: {str(e)[:100]}")
+                    gemini_llm = None
+                    continue
+        
+        # Fallback to API Key if Vertex AI failed
+        if gemini_llm is None and api_key:
+            print("🔑 Falling back to Gemini API Key")
             gemini_llm = LLM(
                 model="gemini/gemini-1.5-flash",
                 api_key=api_key
             )
-        else:
-            print("☁️ Using Google Cloud Vertex AI")
-            project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "eg-konecta-sandbox")
-            gemini_llm = LLM(
-                model="vertex_ai/gemini-1.5-flash",
-                project_id=project_id,
-                location="us-central1"
-            )
+        
+        if gemini_llm is None:
+            raise Exception("No AI model available. Set GEMINI_API_KEY or configure Vertex AI.")
         
         # Instantiate the agents
         update_agent_status('editor', 'working', 'Setting up all agents...', 30)
