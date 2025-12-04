@@ -1,107 +1,45 @@
-# 📧 طلب من Omar - تفعيل Google Cloud APIs
+# 🚨 طلب عاجل جداً من Omar - Deployment Blocked
 
 ## 👋 مرحباً Omar،
 
-أحتاج مساعدتك في تفعيل بعض APIs في المشروع `eg-konecta-sandbox` حتى أتمكن من الـ deployment على Google Cloud Run.
+أنا أحاول عمل Deployment لتطبيق CrewAI (Telegram Bot) على Cloud Run، لكنني **متوقف تماماً** بسبب مشاكل في الصلاحيات والحسابات.
 
----
+حاولت طريقتين وفشلتا:
 
-## ✅ APIs المطلوب تفعيلها
+### 1. المحاولة الأولى: Deployment عبر GitHub (Cloud Build Trigger)
+**النتيجة:** فشل.
+**السبب:** حساب الخدمة الافتراضي **Default Compute Engine Service Account** محذوف أو غير موجود.
+**الخطأ:**
+```
+ERROR: Build service account projects/112458895076/serviceAccounts/112458895076-compute@developer.gserviceaccount.com does not exist.
+```
 
-يرجى تفعيل APIs التالية في المشروع:
-
-### 1. Cloud Run API
-**الرابط المباشر:**
-https://console.cloud.google.com/apis/library/run.googleapis.com?project=eg-konecta-sandbox
-
-**الخطوات:**
-1. افتح الرابط أعلاه
-2. اضغط **"Enable"**
-
----
-
-### 2. Cloud Build API
-**الرابط المباشر:**
-https://console.cloud.google.com/apis/library/cloudbuild.googleapis.com?project=eg-konecta-sandbox
-
-**الخطوات:**
-1. افتح الرابط أعلاه
-2. اضغط **"Enable"**
-
----
-
-### 3. Vertex AI API
-**الرابط المباشر:**
-https://console.cloud.google.com/apis/library/aiplatform.googleapis.com?project=eg-konecta-sandbox
-
-**الخطوات:**
-1. افتح الرابط أعلاه
-2. اضغط **"Enable"**
-
----
-
-### 4. Artifact Registry API
-**الرابط المباشر:**
-https://console.cloud.google.com/apis/library/artifactregistry.googleapis.com?project=eg-konecta-sandbox
-
-**الخطوات:**
-1. افتح الرابط أعلاه
-2. اضغط **"Enable"**
-
----
-
-## 🔧 بديل: عبر gcloud CLI
-
-إذا كنت تفضل استخدام gcloud CLI:
-
-```bash
-gcloud config set project eg-konecta-sandbox
-
-gcloud services enable run.googleapis.com
-gcloud services enable cloudbuild.googleapis.com
-gcloud services enable aiplatform.googleapis.com
-gcloud services enable artifactregistry.googleapis.com
+### 2. المحاولة الثانية: Deployment يدوي (gcloud CLI)
+**النتيجة:** فشل.
+**السبب:** حسابي الشخصي (`ahmed.eltaweel@konecta.com`) ليس لديه صلاحية الكتابة في Storage Bucket الخاص بـ Cloud Build.
+**الخطأ:**
+```
+ERROR: The user is forbidden from accessing the bucket [eg-konecta-sandbox_cloudbuild].
 ```
 
 ---
 
-## 📋 السبب
+## ✅ الحل المطلوب (يرجى تنفيذ واحد منها)
 
-هذه APIs مطلوبة لـ:
-- ✅ **Cloud Run API**: لنشر التطبيقات
-- ✅ **Cloud Build API**: لبناء Docker images من GitHub
-- ✅ **Vertex AI API**: لاستخدام Gemini عبر Service Account
-- ✅ **Artifact Registry API**: لتخزين Docker images
+### الخيار الأفضل: إصلاح Default Service Account 🌟
+يرجى استعادة أو إعادة إنشاء حساب الخدمة الافتراضي:
+`112458895076-compute@developer.gserviceaccount.com`
+ومنحه صلاحيات `Cloud Build Service Account`.
 
----
-
-## ✅ بعد التفعيل
-
-بعد تفعيل APIs، سأتمكن من:
-1. Deploy التطبيقات على Cloud Run
-2. استخدام Service Account (`sa-vertex@eg-konecta-sandbox.iam.gserviceaccount.com`)
-3. الاستفادة من Vertex AI بدلاً من API Keys
+### الخيار البديل: منح صلاحيات لحسابي
+منح حسابي `ahmed.eltaweel@konecta.com` الصلاحيات التالية:
+- `roles/storage.admin` (لرفع الكود)
+- `roles/cloudbuild.builds.editor` (لإنشاء Build)
+- `roles/iam.serviceAccountUser` (لاستخدام sa-vertex)
 
 ---
 
-## 🔒 ملاحظة أمنية
+بدون هذه الإصلاحات، لا يمكنني رفع أي كود على المشروع.
 
-كما ذكرت سابقاً، استخدام **Service Account مع Vertex AI** هو الطريقة الموصى بها من Google بدلاً من API Keys، لأنها:
-- ✅ أكثر أماناً
-- ✅ لا تحتاج لتخزين API Keys
-- ✅ صلاحيات محكومة ومحددة
-
----
-
-## 📞 إذا كان لديك أي أسئلة
-
-يمكنني شرح أي تفاصيل إضافية عن:
-- لماذا نحتاج كل API
-- كيف سيتم استخدامها
-- التكلفة المتوقعة (ضمن Free Tier)
-
----
-
-**شكراً لمساعدتك!** 🙏
-
+شكراً لتفهمك! 🙏
 Ahmed

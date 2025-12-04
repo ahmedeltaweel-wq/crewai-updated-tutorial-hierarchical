@@ -325,8 +325,8 @@ Remember: You're talking to a human, be natural and friendly! 😊"""
         logger.info(f"   Prompt length: {len(prompt)} characters")
         logger.info("-" * 60)
         
-        # Call Gemini
-        response = gemini_model.generate_content(prompt)
+        # Call Gemini (Async)
+        response = await gemini_model.generate_content_async(prompt)
         answer = response.text
         
         # Show what Gemini responded

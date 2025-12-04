@@ -3,6 +3,14 @@ List Available Vertex AI Models
 """
 import os
 from google.cloud import aiplatform
+from dotenv import load_dotenv
+
+load_dotenv()
+
+if os.getenv('GOOGLE_APPLICATION_CREDENTIALS'):
+    print(f"🔑 Using Credentials: {os.getenv('GOOGLE_APPLICATION_CREDENTIALS')}")
+else:
+    print("⚠️ WARNING: GOOGLE_APPLICATION_CREDENTIALS not found!")
 
 # Configuration
 PROJECT_ID = "eg-konecta-sandbox"
@@ -23,24 +31,33 @@ def list_models():
         import vertexai
         vertexai.init(project=PROJECT_ID, location=LOCATION)
         
-        # Try standard model names
+        # List actual models from the API
+        print(f"🔍 Fetching available models from Vertex AI API...")
+        
+        # Use the Model Garden listing
+        from google.cloud import aiplatform
+        
+        # This lists custom models, but let's try to list publisher models if possible
+        # or just try to generate with a very simple prompt to test availability
+        
         test_models = [
             "gemini-1.5-flash-001",
             "gemini-1.5-flash",
-            "gemini-1.5-pro-001",
-            "gemini-1.5-pro",
-            "gemini-1.0-pro-001",
-            "gemini-1.0-pro"
+            "gemini-1.0-pro",
+            "gemini-1.0-pro-001"
         ]
         
-        print("\n🧪 Testing specific model availability:")
+        print("\n🧪 Testing actual generation (True Availability):")
         for model_name in test_models:
             try:
+                print(f"   Testing {model_name}...", end=" ", flush=True)
                 model = GenerativeModel(model_name)
-                # Just try to instantiate, not generate yet
-                print(f"   ✅ {model_name}: Available")
+                # Try a minimal generation to confirm access
+                response = model.generate_content("Hi")
+                print(f"✅ Working!")
             except Exception as e:
-                print(f"   ❌ {model_name}: Not found ({str(e)})")
+                print(f"❌ Failed")
+                # print(f"      Error: {e}") # Uncomment for details
 
     except Exception as e:
         print(f"\n❌ Error initializing Vertex AI: {e}")

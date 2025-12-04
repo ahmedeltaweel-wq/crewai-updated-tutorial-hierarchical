@@ -5,10 +5,20 @@ import os
 import sys
 from dotenv import load_dotenv
 
+# Load environment variables from .env file
+load_dotenv()
+
 # Force configuration for this test
 os.environ['USE_VERTEX_AI'] = 'true'
 os.environ['GOOGLE_CLOUD_PROJECT'] = 'eg-konecta-sandbox'
 os.environ['VERTEX_AI_LOCATION'] = 'us-central1'
+
+# Ensure GOOGLE_APPLICATION_CREDENTIALS is set
+if not os.getenv('GOOGLE_APPLICATION_CREDENTIALS'):
+    print("⚠️ WARNING: GOOGLE_APPLICATION_CREDENTIALS not found in environment!")
+else:
+    print(f"🔑 Using Credentials: {os.getenv('GOOGLE_APPLICATION_CREDENTIALS')}")
+
 # Clear any old API keys to ensure we use Vertex AI
 if 'GOOGLE_API_KEY' in os.environ: del os.environ['GOOGLE_API_KEY']
 if 'GEMINI_API_KEY' in os.environ: del os.environ['GEMINI_API_KEY']
@@ -37,8 +47,8 @@ def test_vertex_ai():
         print("✅ Vertex AI Initialized successfully!")
 
         print("\n🤖 Creating Gemini Model...")
-        # Trying gemini-1.0-pro as fallback
-        model = GenerativeModel("gemini-1.0-pro")
+        # Using specific version 001
+        model = GenerativeModel("gemini-1.5-flash-001")
         print("✅ Model created!")
 
         print("\n💬 Sending test prompt: 'Say Hello in English'...")
