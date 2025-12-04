@@ -177,6 +177,7 @@ def handle_start_service(data):
 
 if __name__ == '__main__':
     print("🏢 Starting Saudi Electric Company Customer Service System...")
-    print("📡 Open your browser at: http://localhost:5001")
+    port = int(os.environ.get('PORT', 8080))
+    print(f"📡 Open your browser at: http://localhost:{port}")
     # In production, debug must be False. eventlet will be used if installed.
-    socketio.run(app, debug=False, host='0.0.0.0', port=5001, allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=False, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True)
