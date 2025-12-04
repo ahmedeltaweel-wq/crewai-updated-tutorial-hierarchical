@@ -1,3 +1,7 @@
+# Eventlet monkey patching must be first!
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
@@ -15,7 +19,7 @@ from io import StringIO
 load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-here'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'newsletter-secret-key')
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -82,12 +86,24 @@ def run_crew_workflow():
         # Initialize the Google Gemini language model using native CrewAI LLM
         update_agent_status('editor', 'working', 'Connecting to Google Gemini...', 20)
         
-        # FIX: Use native LLM class with correct prefix
-        # This solves the litellm.BadRequestError
-        gemini_llm = LLM(
-            model="gemini/gemini-flash-latest",
-            api_key=os.environ.get("GOOGLE_API_KEY")
-        )
+        # FIX: Support both API Key and Vertex AI
+        api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+        use_vertex_ai = os.environ.get("USE_VERTEX_AI", "false").lower() == "true"
+        
+        if api_key and not use_vertex_ai:
+            print("🔑 Using Gemini API Key")
+            gemini_llm = LLM(
+                model="gemini/gemini-1.5-flash",
+                api_key=api_key
+            )
+        else:
+            print("☁️ Using Google Cloud Vertex AI")
+            project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "eg-konecta-sandbox")
+            gemini_llm = LLM(
+                model="vertex_ai/gemini-1.5-flash",
+                project_id=project_id,
+                location="us-central1"
+            )
         
         # Instantiate the agents
         update_agent_status('editor', 'working', 'Setting up all agents...', 30)
@@ -175,8 +191,8 @@ def handle_start_crew():
         emit('workflow_error', {'error': 'Crew is already running!'})
 
 if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 8080))
     print("🚀 Starting AI Newsletter Crew Web Interface...")
-    print("📡 Open your browser at: http://localhost:5000")
-    # التعديل هنا: debug=False وإضافة allow_unsafe_werkzeug كاحتياط
-    socketio.run(app, debug=False, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+    print(f"📡 Open your browser at: http://localhost:{port}")
+    socketio.run(app, debug=False, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True)
 

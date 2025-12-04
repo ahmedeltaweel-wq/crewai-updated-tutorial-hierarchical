@@ -28,19 +28,31 @@ app.config['ALLOWED_EXTENSIONS'] = {'txt', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# Configure Gemini AI
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+# Configure Gemini AI - Support both API Key and Vertex AI
+api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
+use_vertex_ai = os.getenv('USE_VERTEX_AI', 'false').lower() == 'true'
 model = None
 
-if GEMINI_API_KEY:
+if api_key and not use_vertex_ai:
     try:
-        genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel('gemini-flash-latest')
-        print("✅ AI Model: gemini-flash-latest")
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        print("✅ AI Model: gemini-1.5-flash (API Key)")
     except Exception as e:
         print(f"❌ AI Error: {e}")
+elif use_vertex_ai or os.getenv('GOOGLE_CLOUD_PROJECT'):
+    try:
+        from vertexai.preview.generative_models import GenerativeModel
+        import vertexai
+        project_id = os.getenv('GOOGLE_CLOUD_PROJECT', 'eg-konecta-sandbox')
+        location = os.getenv('VERTEX_AI_LOCATION', 'us-central1')
+        vertexai.init(project=project_id, location=location)
+        model = GenerativeModel('gemini-1.5-flash')
+        print(f"✅ AI Model: Vertex AI gemini-1.5-flash ({project_id}/{location})")
+    except Exception as e:
+        print(f"❌ Vertex AI Error: {e}")
 else:
-    print("⚠️  No GEMINI_API_KEY in .env")
+    print("⚠️  No AI configured - set GEMINI_API_KEY or USE_VERTEX_AI=true")
 
 # Database initialization
 def init_db():
@@ -443,7 +455,9 @@ def uploaded_file(filename):
 
 if __name__ == '__main__':
     init_db()
+    port = int(os.environ.get('PORT', 8080))
     print("🚀 Smart DMS Starting...")
-    print("📁 Uploads:", app.config['UPLOAD_FOLDER'])
-    print("🤖 AI:", "Enabled ✅" if model else "Disabled ❌")
-    app.run(debug=True, port=5001)
+    print(f"📁 Uploads: {app.config['UPLOAD_FOLDER']}")
+    print(f"🤖 AI: {'Enabled ✅' if model else 'Disabled ❌'}")
+    print(f"📡 Open your browser at: http://localhost:{port}")
+    app.run(debug=False, host='0.0.0.0', port=port)
