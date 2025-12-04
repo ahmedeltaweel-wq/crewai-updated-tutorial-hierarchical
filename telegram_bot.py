@@ -320,7 +320,7 @@ Remember: You're talking to a human, be natural and friendly! 😊"""
         logger.info(f"📚 CONVERSATION HISTORY: {len(history)} messages")
         logger.info("-" * 60)
         logger.info("📤 SENDING TO GEMINI:")
-        logger.info(f"   Model: gemini-2.0-flash-exp")
+        logger.info(f"   Model: gemini-1.5-flash")
         logger.info(f"   Language: {language}")
         logger.info(f"   Prompt length: {len(prompt)} characters")
         logger.info("-" * 60)
