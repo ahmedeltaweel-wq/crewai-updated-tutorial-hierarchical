@@ -1,3 +1,10 @@
+import os
+# Auto-detect service account JSON for local deployment
+_service_account_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'service-account-key.json')
+if os.path.exists(_service_account_path) and not os.getenv('GOOGLE_APPLICATION_CREDENTIALS'):
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = _service_account_path
+    print(f"🔑 Auto-loaded Service Account: {_service_account_path}")
+
 from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS

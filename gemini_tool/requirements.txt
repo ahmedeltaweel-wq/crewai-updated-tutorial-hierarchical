@@ -1,0 +1,7 @@
+# Core dependencies for Vertex AI with Service Account
+google-cloud-aiplatform>=1.38.0
+google-auth>=2.23.0
+requests>=2.31.0
+
+# Optional: For Google AI Studio alternative (API key approach)
+google-generativeai>=0.3.0

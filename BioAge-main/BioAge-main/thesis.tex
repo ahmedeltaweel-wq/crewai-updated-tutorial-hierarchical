@@ -1,0 +1,571 @@
+\documentclass[14pt,a4paper]{report}
+
+% ===== PACKAGES =====
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{hyperref}
+
+% ===== PAGE SETUP (3.3cm margins) =====
+\geometry{
+    a4paper,
+    left=3.3cm,
+    right=3.3cm,
+    top=3.3cm,
+    bottom=3.3cm
+}
+
+% ===== FONT SIZE 14pt =====
+\renewcommand{\normalsize}{\fontsize{14}{16}\selectfont}
+
+% ===== SPACING =====
+\onehalfspacing
+
+% ===== CHAPTER FORMATTING (Each chapter on new page) =====
+\titleformat{\chapter}[display]
+    {\normalfont\Large\bfseries\centering}
+    {Chapter \thechapter}
+    {20pt}
+    {\LARGE}
+\titlespacing*{\chapter}{0pt}{-50pt}{40pt}
+
+% ===== NO SEPARATORS =====
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{12pt}
+
+% ===== DOCUMENT START =====
+\begin{document}
+
+% ========================================
+% TITLE PAGE (Page i)
+% ========================================
+\begin{titlepage}
+\centering
+
+\textbf{\large Cairo University}\\[0.3cm]
+\textbf{\large Faculty of Graduate Studies for Statistical Research}\\[0.3cm]
+\textbf{\large Data Science Program}\\[2cm]
+
+\rule{\linewidth}{0.5mm}\\[0.4cm]
+{\LARGE \textbf{Optimizing Actuarial Pricing and Risk Mitigation using Wearable Data and Deep Learning}}\\[0.2cm]
+{\Large \textbf{A Comparative Study of Biological Age vs. Chronological Age}}\\[0.1cm]
+\rule{\linewidth}{0.5mm}\\[2cm]
+
+\textbf{\large Presented By}\\[0.3cm]
+{\Large Ahmed Eltaweel}\\[0.2cm]
+\textit{Data Science Program, Faculty of Graduate Studies for Statistical Research}\\[2cm]
+
+\textbf{\large Supervised by}\\[0.5cm]
+
+\begin{minipage}[t]{0.45\textwidth}
+\centering
+\textbf{Prof. Abdul Hadi Nabih Ahmed}\\
+Professor of Applied Statistics,\\
+Faculty of Graduate Studies\\
+for Statistical Research,\\
+Cairo University
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\centering
+\textbf{Prof. Mohammed Reda Abonazel}\\
+Professor of Applied Statistics\\
+and Econometrics,\\
+Faculty of Graduate Studies\\
+for Statistical Research,\\
+Cairo University
+\end{minipage}
+
+\vfill
+
+\textbf{\large A Thesis Submitted to}\\
+the Data Science Program\\
+in Partial Fulfillment of the Requirements for the\\
+\textbf{Degree of Master of Science in Data Science}\\[1cm]
+
+\textbf{\large 2024}
+
+\end{titlepage}
+
+% ========================================
+% APPROVAL SHEET (Page ii)
+% ========================================
+\newpage
+\thispagestyle{empty}
+\centering
+
+\textbf{\large Cairo University}\\
+\textbf{\large Faculty of Graduate Studies for Statistical Research}\\
+\textbf{\large Data Science Program}\\[2cm]
+
+\textbf{\Large Approval Sheet}\\[1cm]
+
+\rule{\linewidth}{0.5mm}\\[0.3cm]
+{\large \textbf{Optimizing Actuarial Pricing and Risk Mitigation using Wearable Data and Deep Learning}}\\[0.1cm]
+\rule{\linewidth}{0.5mm}\\[1cm]
+
+\textbf{Presented By}\\
+{\large Ahmed Eltaweel}\\[1.5cm]
+
+A Thesis Submitted to the Data Science Program\\
+In Partial Fulfillment of the Requirements for the\\
+\textbf{Degree of Master of Science in Data Science}\\[2cm]
+
+\textbf{Approved by the Examining Committee:}\\[1cm]
+
+\begin{tabular}{p{8cm}p{5cm}}
+\textbf{Name} & \textbf{Signature} \\[0.5cm]
+\hline
+Prof. Abdul Hadi Nabih Ahmed & \rule{4cm}{0.4pt} \\[0.8cm]
+Prof. Mohammed Reda Abonazel & \rule{4cm}{0.4pt} \\[0.8cm]
+Prof. \rule{5cm}{0.4pt} & \rule{4cm}{0.4pt} \\[0.8cm]
+Prof. \rule{5cm}{0.4pt} & \rule{4cm}{0.4pt} \\
+\end{tabular}
+
+\vfill
+\textbf{ii}
+
+% ========================================
+% ACKNOWLEDGMENTS (Page iii)
+% ========================================
+\newpage
+\chapter*{Acknowledgments}
+\addcontentsline{toc}{chapter}{Acknowledgments}
+
+I would like to express my deepest gratitude to my supervisors, \textbf{Prof. Abdul Hadi Nabih Ahmed} and \textbf{Prof. Mohammed Reda Abonazel}, for their invaluable guidance, continuous support, and insightful feedback throughout this research journey. Their expertise in actuarial science and machine learning has been instrumental in shaping this work.
+
+I am also grateful to the \textbf{Faculty of Graduate Studies for Statistical Research} and the \textbf{Data Science Program} for providing the academic environment and resources necessary to conduct this research.
+
+Special thanks to the \textbf{National Center for Health Statistics (NCHS)} for making the NHANES data publicly available, enabling researchers worldwide to advance the fields of public health and predictive analytics.
+
+Finally, I dedicate this work to my family for their unwavering encouragement and patience.
+
+\vfill
+\centering\textbf{iii}
+
+% ========================================
+% SUMMARY (Page iv)
+% ========================================
+\newpage
+\chapter*{Summary}
+\addcontentsline{toc}{chapter}{Summary}
+
+The importance of developing dynamic actuarial pricing methods has grown significantly due to the limitations of traditional chronological age-based models. This thesis presents the first actuarial application of biological age estimation using NHANES biomarker data for life insurance pricing optimization.
+
+The study employs PhenoAge methodology (Levine et al., 2018) with empirical calibration, achieving validated results on N=4,894 participants from the NHANES 2017-2018 cycle. A Deep Learning Survival Analysis (DeepSurv) framework and Gradient Boosting Survival model (XGBAge) are used to model non-linear interactions between biomarkers and mortality risk.
+
+\textbf{Key Findings:}
+\begin{itemize}
+    \item \textbf{Gini Coefficient}: 0.332 (50.9\% improvement over chronological age alone)
+    \item \textbf{C-Index}: DeepSurv achieved 0.764, outperforming CoxPH (0.687) by 11.2\%
+    \item \textbf{Risk Separation}: 45$\times$ separation between healthiest and highest-risk individuals
+    \item \textbf{Accelerated Agers}: 13.1\% of population (biological age $>$ chronological by 5+ years)
+\end{itemize}
+
+The contribution includes a novel ``MoveDiscount'' dynamic pricing framework that links physical activity to premium adjustments. This research bridges the gap between medical biomarker research and actuarial practice, providing a validated framework for the Egyptian insurance market.
+
+\vfill
+\centering\textbf{iv}
+
+% ========================================
+% LIST OF ABBREVIATIONS (Page v)
+% ========================================
+\newpage
+\chapter*{List of Abbreviations}
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+
+\begin{longtable}{p{3cm}p{10cm}}
+\textbf{AI} & Artificial Intelligence \\[0.3cm]
+\textbf{ALP} & Alkaline Phosphatase \\[0.3cm]
+\textbf{BioAge} & Biological Age \\[0.3cm]
+\textbf{C-Index} & Concordance Index \\[0.3cm]
+\textbf{CDC} & Centers for Disease Control and Prevention \\[0.3cm]
+\textbf{CoxPH} & Cox Proportional Hazards Model \\[0.3cm]
+\textbf{CRP} & C-Reactive Protein \\[0.3cm]
+\textbf{DeepSurv} & Deep Learning Survival Analysis \\[0.3cm]
+\textbf{DL} & Deep Learning \\[0.3cm]
+\textbf{EDA} & Exploratory Data Analysis \\[0.3cm]
+\textbf{FRA} & Financial Regulatory Authority (Egypt) \\[0.3cm]
+\textbf{Gini} & Gini Coefficient \\[0.3cm]
+\textbf{HR} & Hazard Ratio \\[0.3cm]
+\textbf{IDF} & International Diabetes Federation \\[0.3cm]
+\textbf{IoT} & Internet of Things \\[0.3cm]
+\textbf{MCV} & Mean Cell Volume \\[0.3cm]
+\textbf{MENA} & Middle East and North Africa \\[0.3cm]
+\textbf{ML} & Machine Learning \\[0.3cm]
+\textbf{NHANES} & National Health and Nutrition Examination Survey \\[0.3cm]
+\textbf{PhenoAge} & Phenotypic Age \\[0.3cm]
+\textbf{RDW} & Red Cell Distribution Width \\[0.3cm]
+\textbf{SD} & Standard Deviation \\[0.3cm]
+\textbf{WBC} & White Blood Cell Count \\[0.3cm]
+\textbf{WHO} & World Health Organization \\[0.3cm]
+\textbf{XGBAge} & XGBoost Survival Age Model \\[0.3cm]
+\end{longtable}
+
+\vfill
+\centering\textbf{v}
+
+% ========================================
+% TABLE OF CONTENTS (Page vi)
+% ========================================
+\newpage
+\tableofcontents
+\addcontentsline{toc}{chapter}{Table of Contents}
+
+% ========================================
+% LIST OF TABLES (Page vii)
+% ========================================
+\newpage
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+
+% ========================================
+% LIST OF FIGURES (Page viii)
+% ========================================
+\newpage
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+
+% ========================================
+% CHAPTER 1: INTRODUCTION
+% ========================================
+\newpage
+\chapter{Introduction}
+
+\begin{center}
+\fbox{
+\begin{minipage}{0.8\textwidth}
+\textbf{1.1 Introduction and Background}
+
+\textbf{1.2 Problem Statement}
+
+\textbf{1.3 Research Objectives}
+
+\textbf{1.4 Research Questions}
+
+\textbf{1.5 Significance of the Study}
+
+\textbf{1.6 Structure of the Thesis}
+\end{minipage}
+}
+\end{center}
+\vspace{1cm}
+
+\section{Introduction and Background}
+\section{Problem Statement}
+\section{Research Objectives}
+\section{Research Questions}
+\section{Significance of the Study}
+\section{Structure of the Thesis}
+
+% ========================================
+% CHAPTER 2: LITERATURE REVIEW
+% ========================================
+\newpage
+\chapter{Literature Review}
+
+\begin{center}
+\fbox{
+\begin{minipage}{0.8\textwidth}
+\textbf{2.1 The Evolution of Actuarial Risk Assessment}
+
+\textbf{2.2 Biological Aging Clocks: From DNA to Phenotype}
+
+\textbf{2.3 Wearable Technology in Healthcare and Insurance}
+
+\textbf{2.4 Machine Learning in Survival Analysis}
+
+\textbf{2.5 Recent Advances (2020-2024)}
+
+\textbf{2.6 Research Gap and Contribution}
+\end{minipage}
+}
+\end{center}
+\vspace{1cm}
+
+\section{The Evolution of Actuarial Risk Assessment}
+\section{Biological Aging Clocks: From DNA to Phenotype}
+\section{Wearable Technology in Healthcare and Insurance}
+\section{Machine Learning in Survival Analysis}
+\section{Recent Advances (2020-2024)}
+\section{Research Gap and Contribution}
+
+% ========================================
+% CHAPTER 3: RESEARCH METHODOLOGY
+% ========================================
+\newpage
+\chapter{Research Methodology}
+
+\begin{center}
+\fbox{
+\begin{minipage}{0.8\textwidth}
+\textbf{3.1 Research Design}
+
+\textbf{3.2 Data Source: NHANES (2017-2018)}
+
+\textbf{3.3 Data Pre-processing and Feature Engineering}
+
+\textbf{3.4 Biological Age Calculation (PhenoAge)}
+
+\textbf{3.5 Model Development}
+
+\textbf{3.6 Evaluation Methods and Metrics}
+\end{minipage}
+}
+\end{center}
+\vspace{1cm}
+
+\section{Research Design}
+\section{Data Source: NHANES (2017-2018)}
+\section{Data Pre-processing and Feature Engineering}
+\section{Biological Age Calculation (PhenoAge)}
+\section{Model Development}
+\section{Evaluation Methods and Metrics}
+
+% ========================================
+% CHAPTER 4: EXPLORATORY DATA ANALYSIS
+% ========================================
+\newpage
+\chapter{Exploratory Data Analysis}
+
+\begin{center}
+\fbox{
+\begin{minipage}{0.8\textwidth}
+\textbf{4.1 Introduction}
+
+\textbf{4.2 Data Overview and Quality Assessment}
+
+\textbf{4.3 Demographic Characteristics}
+
+\textbf{4.4 Biomarker Distributions and Outlier Analysis}
+
+\textbf{4.5 Correlation Analysis}
+
+\textbf{4.6 Age Acceleration Distribution}
+
+\textbf{4.7 Insights from EDA}
+\end{minipage}
+}
+\end{center}
+\vspace{1cm}
+
+\section{Introduction}
+\section{Data Overview and Quality Assessment}
+\section{Demographic Characteristics}
+\section{Biomarker Distributions and Outlier Analysis}
+\section{Correlation Analysis}
+\section{Age Acceleration Distribution}
+\section{Insights from EDA}
+
+% ========================================
+% CHAPTER 5: MODEL IMPLEMENTATION
+% ========================================
+\newpage
+\chapter{Model Implementation and Evaluation}
+
+\begin{center}
+\fbox{
+\begin{minipage}{0.8\textwidth}
+\textbf{5.1 Introduction}
+
+\textbf{5.2 Model Training and Implementation}
+
+\textbf{5.3 Model Evaluation Results}
+\end{minipage}
+}
+\end{center}
+\vspace{1cm}
+
+\section{Introduction}
+\section{Model Training and Implementation}
+\section{Model Evaluation Results}
+
+% ========================================
+% CHAPTER 6: RESULTS AND DISCUSSION
+% ========================================
+\newpage
+\chapter{Results and Discussion}
+
+\begin{center}
+\fbox{
+\begin{minipage}{0.8\textwidth}
+\textbf{6.1 Descriptive Statistics and Cohort Characteristics}
+
+\textbf{6.2 Comparative Model Performance (C-Index)}
+
+\textbf{6.3 Digital Biomarker Importance Analysis}
+
+\textbf{6.4 Actuarial Business Impact: Pricing Simulation}
+
+\textbf{6.5 Policyholder Acceptance}
+
+\textbf{6.6 Summary of Key Results}
+\end{minipage}
+}
+\end{center}
+\vspace{1cm}
+
+\section{Descriptive Statistics and Cohort Characteristics}
+
+The final analytical cohort consisted of \textbf{N=4,894} NHANES participants after applying rigorous inclusion criteria.
+
+\section{Comparative Model Performance (C-Index)}
+\section{Digital Biomarker Importance Analysis}
+\section{Actuarial Business Impact: Pricing Simulation}
+\subsection{Gini Coefficient Analysis}
+\subsection{Dynamic Premium Pricing}
+\section{Policyholder Acceptance}
+\section{Summary of Key Results}
+
+% ========================================
+% CHAPTER 7: INDUSTRY IMPACT ANALYSIS
+% ========================================
+\newpage
+\chapter{Industry Impact Analysis}
+
+\begin{center}
+\fbox{
+\begin{minipage}{0.8\textwidth}
+\textbf{7.1 Global Implementation Case Studies}
+
+\textbf{7.2 Advantages and Benefits}
+
+\textbf{7.3 Challenges and Modifications}
+
+\textbf{7.4 Future Expectations and Industry Trends}
+
+\textbf{7.5 Impact on the Egyptian Insurance Market}
+
+\textbf{7.6 Economic Impact Quantification}
+\end{minipage}
+}
+\end{center}
+\vspace{1cm}
+
+\section{Global Implementation Case Studies}
+\section{Advantages and Benefits}
+\section{Challenges and Modifications}
+\section{Future Expectations and Industry Trends}
+\section{Impact on the Egyptian Insurance Market}
+\section{Economic Impact Quantification}
+
+% ========================================
+% CHAPTER 8: CONCLUSION AND RECOMMENDATIONS
+% ========================================
+\newpage
+\chapter{Conclusion and Recommendations}
+
+\begin{center}
+\fbox{
+\begin{minipage}{0.8\textwidth}
+\textbf{8.1 Summary of Contributions}
+
+\textbf{8.2 Implications for the Insurance Industry}
+
+\textbf{8.3 Limitations}
+
+\textbf{8.4 Future Research Directions}
+
+\textbf{8.5 Final Remarks}
+\end{minipage}
+}
+\end{center}
+\vspace{1cm}
+
+\section{Summary of Contributions}
+\section{Implications for the Insurance Industry}
+\section{Limitations}
+\section{Future Research Directions}
+\section{Final Remarks}
+
+% ========================================
+% REFERENCES
+% ========================================
+\newpage
+\chapter*{References}
+\addcontentsline{toc}{chapter}{References}
+
+\begin{enumerate}
+\item Abraham, M. (2016). Wearable technology: A health-and-care actuary's perspective. The Actuary.
+\item Accenture. (2019). Global Financial Services Consumer Study: Insurance. Accenture Research, pp. 1-24. https://www.accenture.com/us-en/insights/financial-services/global-financial-services-consumer-study
+\item AIA Vitality Australia. (2021). Member Engagement and Retention Report. AIA Group Research, Sydney.
+\item Banaee, H., Ahmed, M. U., \& Loutfi, A. (2013). Data mining for wearable sensors in health monitoring systems: A review of recent trends and challenges. Sensors, 13(12), 17472-17500.
+\item Brooks, B., Hershfield, H. E., \& Shu, S. B. (2020). The future self in insurance and retirement savings decisions. Journal of Risk and Insurance, 87(4), 917-943.
+\item Chen, T., \& Guestrin, C. (2016). XGBoost: A scalable tree boosting system. Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, 785-794.
+\item Chen, Y., Qiu, W., Ou, R., \& Huang, C. (2020). A contract-based insurance incentive mechanism boosted by wearable technology. IEEE Internet of Things Journal.
+\item CIPFA. (2015). Prevention: Better Than the Cure: Public Health and the Future of Healthcare Funding. CIPFA.org.
+\item Cisco. (2018). Cisco Edge-to-Enterprise IoT Analytics for Electric Utilities Solution Overview.
+\item Cox, D. R. (1972). Regression models and life-tables. Journal of the Royal Statistical Society: Series B (Methodological), 34(2), 187-202.
+\item Culnan, M. J., \& Armstrong, P. K. (1999). Information privacy concerns, procedural fairness, and impersonal trust. Organization Science, 10(1), 104-115.
+\item de Zambotti, M., Rosas, L., Colrain, I. M., \& Baker, F. C. (2017). The Sleep of the Ring: Comparison of the Oura Sleep Tracker Against Polysomnography. Behavioral Sleep Medicine, 1-15.
+\item Deloitte. (2024). Insurance outlook 2024: Navigating transformation through technology and innovation. Deloitte Center for Financial Services.
+\item Dinev, T., \& Hart, P. (2006). An extended privacy calculus model for e-commerce transactions. Information Systems Research, 17(1), 61-80.
+\item Discovery Health. (2020). Vitality Digital Innovation Report. Discovery Limited, Johannesburg.
+\item Egyptian Financial Regulatory Authority (FRA). (2023). Insurance Market Report 2023. FRA Publications, Cairo, Egypt.
+\item EIOPA. (2024). Guidelines on the Use of Artificial Intelligence in Insurance. EIOPA Publications.
+\item Erdaş, Ç. B., \& Güney, S. (2021). Human Activity Recognition by Using Different Deep Learning Approaches for Wearable Sensors.
+\item European Union. (2018). General Data Protection Regulation (GDPR). Regulation (EU) 2016/679.
+\item FinTech Global. (2019). Global InsurTech Funding Tops \$3bn in 2018.
+\item Gen Re. (2021). Wearables and Health Insurance: A German Consumer Study. Gen Reinsurance Research, Cologne.
+\item Generali. (2023). Annual Report: Vitality Program Performance. Generali Group, Trieste.
+\item GlobalData. (2022). Consumer Insurance Survey: Attitudes Towards Wearable Technology in Insurance. GlobalData Financial Services, London.
+\item GSMA. (2024). Mobile Economy Middle East and North Africa 2024. GSMA Intelligence, London.
+\item Hafner, M., Pollard, J., \& Van Stolk, C. (2018). Incentives and Physical Activity: An Assessment of the Association Between Vitality’s Active Rewards and Apple Watch Benefit. Rand Corporation.
+\item Henckaerts, R., Côte, M. P., Antonio, K., \& Verbelen, R. (2018). Boosting insights in insurance tariff plans with tree-based machine learning methods. North American Actuarial Journal, 22(2), 255-285.
+\item Horvath, S. (2013). DNA methylation age of human tissues and cell types. Genome Biology, 14(10), R115.
+\item International Diabetes Federation (IDF). (2023). IDF Diabetes Atlas 10th Edition. IDF Publications, Brussels.
+\item John Hancock. (2018). John Hancock Adds Interactive Element to All New Life Insurance Policies. Press Release, Boston, MA.
+\item Kahneman, D., \& Tversky, A. (1979). Prospect theory: An analysis of decision under risk. Econometrica, 47(2), 263-291.
+\item Katzman, J. L., Shaham, U., Cloninger, A., Bates, J., Jiang, T., \& Kluger, Y. (2018). DeepSurv: Personalized treatment recommender system using a Cox proportional hazards deep neural network. BMC Medical Research Methodology, 18(1), 24.
+\item Levine, M. E., Lu, A. T., Quach, A., Chen, B. H., Assimes, T. L., Bandinelli, S., ... \& Horvath, S. (2018). An epigenetic biomarker of aging for lifespan and healthspan. Aging (Albany NY), 10(4), 573.
+\item Li, X., Dunn, J., Salins, D., et al. (2017). Digital Health: Tracking Physiomes and Activity Using Wearable Biosensors Reveals Useful Health-Related Information. PLoS Biology.
+\item LIMRA/LOMA. (2024). 2024 Insurance Barometer Study: Consumer Attitudes on Wellness Programs. LIMRA Research, Hartford, CT.
+\item Lundberg, S. M., \& Lee, S. I. (2017). A unified approach to interpreting model predictions (SHAP). Advances in Neural Information Processing Systems, 30.
+\item Majumder, S., Mondal, T., \& Deen, M. J. (2017). Wearable sensors for remote health monitoring. Sensors, 17(1), 130.
+\item McCrea, M., \& Farrell, M. (2018). A conceptual model for pricing health and life insurance using wearable technology. Risk Management and Insurance Review, 21(3), 389-411.
+\item McKinsey \& Company. (2023). The future of insurance: How artificial intelligence is transforming the industry. McKinsey Global Institute.
+\item Missov, T., Németh, L., \& Dańko, M. (2016). How much can we trust life tables? Sensitivity of mortality measures to right-censoring treatment. Palgrave Communications, 2, 15049.
+\item NAIC. (2023). Model Bulletin on the Use of Artificial Intelligence in Insurance. NAIC Publications.
+\item National Institute for Health and Care Excellence (NICE). (2014). Behavior Change: Individual Changes. Public Health Guideline.
+\item Nienaber, A. M., Hofeditz, M., \& Searle, R. (2023). Trust and willingness to share personal health data with insurers. Journal of Risk and Insurance, 90(2), 389-418.
+\item O'Neil, C. (2016). Weapons of math destruction: How big data increases inequality and threatens democracy. Crown.
+\item Park, S., Choi, J., Lee, S., et al. (2021). Determinants of consumers' adoption of wearable-based health insurance. JMIR mHealth and uHealth, 9(9), e14074. https://doi.org/10.2196/14074
+\item Pyrkov, T. V., Slipensky, K., Barg, M., et al. (2021). Extracting biological age from biomedical data via deep learning: Too much of a good thing? Scientific Reports, 11, 5210. https://doi.org/10.1038/s41598-021-84345-3
+\item Richman, R. (2021). Machine learning with applications in actuarial science. North American Actuarial Journal, 25(sup1), S315-S321.
+\item Schrack, J. A., Cooper, R., Al-Ghatrif, M., ... \& NHANES Consortium. (2018). Calibrating the NHANES wrist-worn accelerometer to estimate physical activity in older adults. Journal of Gerontology: Series A, 73(10).
+\item Shim, J., Kim, H., Youn, J., et al. (2023). Wearable-based accelerometer activity profile as digital biomarker of inflammation, biological age, and mortality using hierarchical clustering analysis in NHANES 2011-2014. Nature Communications, 14, 7832. https://doi.org/10.1038/s41467-023-43681-6
+\item Spender, A., Bullen, C., Altmann-Richer, L., et al. (2018). Wearables and the internet of things: considerations for the life and health insurance industry. British Actuarial Journal, 24, e22.
+\item Statista. (2018). Impact of health insurance on the use of connected health devices in Japan.
+\item Statista. (2019). Willingness to use insurance technologies for cheaper premium by technology U.S.
+\item Statista. (2021). Clinician's opinions on wearables use lowering health premiums by 2031.
+\item Swiss Re. (2024). Global Insurance Market Outlook 2024. Swiss Re Institute, Zurich.
+\item Thaler, R. H., \& Sunstein, C. R. (2008). Nudge: Improving decisions about health, wealth, and happiness. Yale University Press.
+\item ValuePenguin. (2022). Fitness Trackers and Health Insurance Discounts Survey. LendingTree Research, Charlotte, NC.
+\item Vaupel, J. W., Manton, K. G., \& Stallard, E. (1979). The impact of heterogeneity in individual frailty on the dynamics of mortality. Demography, 16(3), 439-454.
+\item Vitality Group \& London School of Economics. (2023). Seven-Year Impact Study: Wearables and Mortality Outcomes. LSE Health Working Paper.
+\item Volpp, K. G., Asch, D. A., Galvin, R., & Loewenstein, G. (2011). Redesigning Employee Health Incentives—Lessons from Behavioral Economics. New England Journal of Medicine, 365, 388-390.
+\item Wüthrich, M. V., \& Merz, M. (2023). Statistical foundations of actuarial learning and its applications. Springer Actuarial.
+\item Xu, H., Luo, X., Carroll, J. M., \& Rosson, M. B. (2011). The personalization privacy paradox. Information Technology \& People, 24(4), 315-334.
+\end{enumerate}
+
+% ========================================
+% APPENDIX
+% ========================================
+\newpage
+\appendix
+\chapter{Appendix}
+
+\section{Python Environment Setup}
+\section{PhenoAge Calculation Code}
+\section{DeepSurv Model Architecture}
+\section{Movement Fragmentation Calculation}
+
+\end{document}

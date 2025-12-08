@@ -1,17 +1,36 @@
 # Eventlet monkey patching must be first!
+print("🚀 Starting Electric Web App...")
 import eventlet
+print("  ✓ eventlet imported")
 eventlet.monkey_patch()
+print("  ✓ monkey_patch done")
+
+import os
+print("  ✓ os imported")
+# Auto-detect service account JSON for local deployment
+_service_account_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'service-account-key.json')
+if os.path.exists(_service_account_path) and not os.getenv('GOOGLE_APPLICATION_CREDENTIALS'):
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = _service_account_path
+    print(f"  🔑 Auto-loaded Service Account: {_service_account_path}")
 
 from flask import Flask, render_template, jsonify, request
+print("  ✓ flask imported")
 from flask_socketio import SocketIO, emit
+print("  ✓ flask_socketio imported")
 from flask_cors import CORS
+print("  ✓ flask_cors imported")
 from crewai import Crew, Process, LLM
+print("  ✓ crewai imported")
 from electric_agents import SaudiElectricAgents
+print("  ✓ electric_agents imported")
 from electric_tasks import SaudiElectricTasks
+print("  ✓ electric_tasks imported")
 from electric_file_io import save_service_report
+print("  ✓ electric_file_io imported")
 from dotenv import load_dotenv
+print("  ✓ dotenv imported")
 import threading
-import os
+print("  ✓ All imports complete!")
 
 load_dotenv()
 

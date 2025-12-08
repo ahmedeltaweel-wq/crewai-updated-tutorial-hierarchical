@@ -1,0 +1,13 @@
+pandas>=2.0.0
+numpy>=1.24.0
+matplotlib
+seaborn
+scikit-learn
+xgboost
+lifelines
+torchtuples
+pycox
+torch>=2.0.0
+requests
+openpyxl
+statsmodels>=0.14.0
