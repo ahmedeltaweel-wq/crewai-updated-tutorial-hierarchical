@@ -155,8 +155,7 @@ def run_customer_service_workflow(request_text):
         crew = Crew(
             agents=[call_receiver, billing_specialist, technical_support, service_coordinator],
             tasks=[receive_task, billing_task, technical_task, compile_task],
-            process=Process.hierarchical,
-            manager_llm=gemini_llm,
+            process=Process.sequential,
             verbose=True
         )
         
