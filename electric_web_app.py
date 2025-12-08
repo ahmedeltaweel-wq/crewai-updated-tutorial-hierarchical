@@ -92,52 +92,42 @@ def run_customer_service_workflow(request_text):
         update_agent_status('call_receiver', 'working', 'Connecting to AI system...', 20)
         
         api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
-        use_vertex = os.environ.get("USE_VERTEX_AI", "true").lower() == "true"
+        use_vertex = os.environ.get("USE_VERTEX_AI", "false").lower() == "true"
         
         gemini_llm = None
         
-        if use_vertex or not api_key:
+        if use_vertex:
             print("☁️ Using Google Cloud Vertex AI (Service Account)")
             project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "eg-konecta-sandbox")
             location = os.environ.get("VERTEX_AI_LOCATION", "us-central1")
             
-            # Try multiple models in order of preference
-            vertex_models = [
-                "vertex_ai/gemini-1.5-flash-001",
-                "vertex_ai/gemini-1.5-flash",
-                "vertex_ai/gemini-1.5-pro-001",
-                "vertex_ai/gemini-1.5-pro",
-                "vertex_ai/gemini-1.0-pro-001",
-                "vertex_ai/gemini-1.0-pro",
-                "vertex_ai/gemini-pro",
-            ]
+            # Initialize Vertex AI first
+            try:
+                import vertexai
+                vertexai.init(project=project_id, location=location)
+                print(f"✅ Vertex AI initialized: {project_id} / {location}")
+            except Exception as e:
+                print(f"⚠️ Vertex AI init warning: {e}")
             
-            for model_name in vertex_models:
-                try:
-                    print(f"🔄 Trying model: {model_name}")
-                    gemini_llm = LLM(
-                        model=model_name,
-                        project_id=project_id,
-                        location=location
-                    )
-                    # Test the model with a simple call
-                    print(f"✅ Model {model_name} initialized successfully!")
-                    break
-                except Exception as e:
-                    print(f"❌ Model {model_name} failed: {str(e)[:100]}")
-                    gemini_llm = None
-                    continue
+            # Use Vertex AI model with CrewAI
+            gemini_llm = LLM(
+                model="vertex_ai/gemini-1.5-flash",
+                vertex_project=project_id,
+                vertex_location=location
+            )
+            print("✅ Vertex AI LLM ready!")
         
-        # Fallback to API Key if Vertex AI failed
+        # Fallback to API Key if Vertex AI not configured or failed
         if gemini_llm is None and api_key:
-            print("🔑 Falling back to Gemini API Key")
+            print("🔑 Using Gemini API Key")
             gemini_llm = LLM(
                 model="gemini/gemini-1.5-flash",
                 api_key=api_key
             )
         
         if gemini_llm is None:
-            raise Exception("No AI model available. Set GEMINI_API_KEY or configure Vertex AI.")
+            raise Exception("No AI model available. Set USE_VERTEX_AI=true or provide GEMINI_API_KEY.")
+
         
         # Create agents
         update_agent_status('call_receiver', 'working', 'Preparing service team...', 30)
