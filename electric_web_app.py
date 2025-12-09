@@ -111,7 +111,7 @@ def run_customer_service_workflow(request_text):
             
             # Use Vertex AI model with CrewAI
             gemini_llm = LLM(
-                model="vertex_ai/gemini-1.5-flash",
+                model="vertex_ai/gemini-2.0-flash-001",
                 vertex_project=project_id,
                 vertex_location=location
             )
@@ -121,7 +121,7 @@ def run_customer_service_workflow(request_text):
         if gemini_llm is None and api_key:
             print("🔑 Using Gemini API Key")
             gemini_llm = LLM(
-                model="gemini/gemini-1.5-flash",
+                model="gemini/gemini-2.0-flash-001",
                 api_key=api_key
             )
         

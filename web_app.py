@@ -87,24 +87,45 @@ def run_crew_workflow():
         agents = AINewsLetterAgents()
         tasks = AINewsLetterTasks()
         
-        # Initialize the Google Gemini language model using rate-limited wrapper
-        update_agent_status('editor', 'working', 'Connecting to Google Gemini...', 20)
+        # Initialize the Google Gemini language model
+        update_agent_status('editor', 'working', 'Connecting to AI...', 20)
         
         api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY or GOOGLE_API_KEY not found in environment variables")
-
-        # Use RateLimitedLLM to add 6-second delay between API calls
-        # This prevents quota exhaustion (10 requests/minute limit)
-        gemini_llm = RateLimitedLLM(
-            model="gemini/gemini-2.0-flash-exp",
-            api_key=api_key,
-            delay_seconds=6  # Wait 6 seconds between each API call
-        )
+        use_vertex = os.environ.get("USE_VERTEX_AI", "false").lower() == "true"
+        
+        from crewai import LLM
+        gemini_llm = None
+        
+        if use_vertex:
+            print("☁️ Using Google Cloud Vertex AI (Service Account)")
+            project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "eg-konecta-sandbox")
+            location = os.environ.get("VERTEX_AI_LOCATION", "us-central1")
+            
+            try:
+                import vertexai
+                vertexai.init(project=project_id, location=location)
+                print(f"✅ Vertex AI initialized: {project_id} / {location}")
+            except Exception as e:
+                print(f"⚠️ Vertex AI init warning: {e}")
+            
+            gemini_llm = LLM(
+                model="vertex_ai/gemini-2.0-flash-001",
+                vertex_project=project_id,
+                vertex_location=location
+            )
+            print("✅ Vertex AI LLM ready!")
+        elif api_key:
+            print("🔑 Using Gemini API Key")
+            gemini_llm = RateLimitedLLM(
+                model="gemini/gemini-2.0-flash-exp",
+                api_key=api_key,
+                delay_seconds=6
+            )
+        else:
+            raise ValueError("No AI model available. Set USE_VERTEX_AI=true or provide GEMINI_API_KEY")
         
         # Instantiate the agents
         update_agent_status('editor', 'working', 'Setting up all agents...', 30)
-        # IMPORTANT: We must pass the LLM to each agent, otherwise they default to OpenAI
         editor = agents.editor_agent(llm=gemini_llm)
         news_fetcher = agents.news_fetcher_agent(llm=gemini_llm)
         news_analyzer = agents.news_analyzer_agent(llm=gemini_llm)
@@ -126,8 +147,7 @@ def run_crew_workflow():
         crew = Crew(
             agents=[editor, news_fetcher, news_analyzer, newsletter_compiler],
             tasks=[fetch_news_task, analyze_news_task, compile_newsletter_task],
-            process=Process.hierarchical,
-            manager_llm=gemini_llm,
+            process=Process.sequential,
             verbose=True
         )
         

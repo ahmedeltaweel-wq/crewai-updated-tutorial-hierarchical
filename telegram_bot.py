@@ -34,8 +34,8 @@ use_vertex_ai = os.getenv('USE_VERTEX_AI', 'false').lower() == 'true'
 if api_key and not use_vertex_ai:
     logger.info("🔑 Using Gemini API Key")
     genai.configure(api_key=api_key)
-    # Using gemini-1.5-flash as recommended for production
-    gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+    # Using gemini-2.0-flash-001 for production
+    gemini_model = genai.GenerativeModel('gemini-2.0-flash-001')
 elif use_vertex_ai or (not api_key and os.getenv('GOOGLE_CLOUD_PROJECT')):
     # Use Vertex AI (Service Account)
     try:
@@ -47,7 +47,7 @@ elif use_vertex_ai or (not api_key and os.getenv('GOOGLE_CLOUD_PROJECT')):
         location = os.getenv('VERTEX_AI_LOCATION', 'us-central1')
         
         vertexai.init(project=project_id, location=location)
-        gemini_model = GenerativeModel('gemini-1.5-flash')
+        gemini_model = GenerativeModel('gemini-2.0-flash-001')
         logger.info(f"✅ Vertex AI initialized: {project_id} / {location}")
     except Exception as e:
         logger.error(f"❌ Failed to initialize Vertex AI: {e}")
@@ -320,7 +320,7 @@ Remember: You're talking to a human, be natural and friendly! 😊"""
         logger.info(f"📚 CONVERSATION HISTORY: {len(history)} messages")
         logger.info("-" * 60)
         logger.info("📤 SENDING TO GEMINI:")
-        logger.info(f"   Model: gemini-1.5-flash")
+        logger.info(f"   Model: gemini-2.0-flash-001")
         logger.info(f"   Language: {language}")
         logger.info(f"   Prompt length: {len(prompt)} characters")
         logger.info("-" * 60)

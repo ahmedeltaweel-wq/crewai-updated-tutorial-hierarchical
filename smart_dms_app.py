@@ -36,8 +36,8 @@ model = None
 if api_key and not use_vertex_ai:
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        print("✅ AI Model: gemini-1.5-flash (API Key)")
+        model = genai.GenerativeModel('gemini-2.0-flash-001')
+        print("✅ AI Model: gemini-2.0-flash-001 (API Key)")
     except Exception as e:
         print(f"❌ AI Error: {e}")
 elif use_vertex_ai or os.getenv('GOOGLE_CLOUD_PROJECT'):
@@ -47,8 +47,8 @@ elif use_vertex_ai or os.getenv('GOOGLE_CLOUD_PROJECT'):
         project_id = os.getenv('GOOGLE_CLOUD_PROJECT', 'eg-konecta-sandbox')
         location = os.getenv('VERTEX_AI_LOCATION', 'us-central1')
         vertexai.init(project=project_id, location=location)
-        model = GenerativeModel('gemini-1.5-flash')
-        print(f"✅ AI Model: Vertex AI gemini-1.5-flash ({project_id}/{location})")
+        model = GenerativeModel('gemini-2.0-flash-001')
+        print(f"✅ AI Model: Vertex AI gemini-2.0-flash-001 ({project_id}/{location})")
     except Exception as e:
         print(f"❌ Vertex AI Error: {e}")
 else:
