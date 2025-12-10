@@ -49,6 +49,7 @@ class SaudiElectricTasks():
             """,
             agent=agent,
             context=context,
+            async_execution=True,  # Run in parallel
             expected_output="""Detailed bill explanation including:
             - Monthly consumption details
             - Tariff tiers and prices explanation
@@ -73,6 +74,7 @@ class SaudiElectricTasks():
             """,
             agent=agent,
             context=context,
+            async_execution=True,  # Run in parallel with billing
             expected_output="""Technical report including:
             - Problem diagnosis
             - Severity level (high/medium/low)

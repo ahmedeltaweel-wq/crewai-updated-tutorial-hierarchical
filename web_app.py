@@ -111,9 +111,10 @@ def run_crew_workflow():
             gemini_llm = LLM(
                 model="vertex_ai/gemini-2.0-flash-001",
                 vertex_project=project_id,
-                vertex_location=location
+                vertex_location=location,
+                max_rpm=60  # Faster processing
             )
-            print("✅ Vertex AI LLM ready!")
+            print("✅ Vertex AI LLM ready (optimized)!")
         elif api_key:
             print("🔑 Using Gemini API Key")
             gemini_llm = RateLimitedLLM(
@@ -142,12 +143,14 @@ def run_crew_workflow():
         compile_newsletter_task = tasks.compile_newsletter_task(
             newsletter_compiler, [analyze_news_task], save_markdown)
         
-        # Form the crew
+        # Form the crew (optimized)
         update_agent_status('editor', 'working', 'Forming the crew...', 70)
         crew = Crew(
             agents=[editor, news_fetcher, news_analyzer, newsletter_compiler],
             tasks=[fetch_news_task, analyze_news_task, compile_newsletter_task],
             process=Process.sequential,
+            memory=True,
+            cache=True,
             verbose=True
         )
         

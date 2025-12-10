@@ -109,20 +109,22 @@ def run_customer_service_workflow(request_text):
             except Exception as e:
                 print(f"⚠️ Vertex AI init warning: {e}")
             
-            # Use Vertex AI model with CrewAI
+            # Use Vertex AI model with CrewAI (optimized for speed)
             gemini_llm = LLM(
                 model="vertex_ai/gemini-2.0-flash-001",
                 vertex_project=project_id,
-                vertex_location=location
+                vertex_location=location,
+                max_rpm=60  # 60 requests per minute for faster processing
             )
-            print("✅ Vertex AI LLM ready!")
+            print("✅ Vertex AI LLM ready (optimized)!")
         
         # Fallback to API Key if Vertex AI not configured or failed
         if gemini_llm is None and api_key:
             print("🔑 Using Gemini API Key")
             gemini_llm = LLM(
                 model="gemini/gemini-2.0-flash-001",
-                api_key=api_key
+                api_key=api_key,
+                max_rpm=60  # 60 requests per minute
             )
         
         if gemini_llm is None:
@@ -150,12 +152,14 @@ def run_customer_service_workflow(request_text):
         compile_task = tasks.compile_service_report_task(
             service_coordinator, [receive_task, billing_task, technical_task], save_service_report)
         
-        # Form the crew
+        # Form the crew (optimized with memory and caching)
         update_agent_status('service_coordinator', 'working', 'Forming service team...', 80)
         crew = Crew(
             agents=[call_receiver, billing_specialist, technical_support, service_coordinator],
             tasks=[receive_task, billing_task, technical_task, compile_task],
             process=Process.sequential,
+            memory=True,   # Enable memory for context
+            cache=True,    # Cache repeated queries
             verbose=True
         )
         
