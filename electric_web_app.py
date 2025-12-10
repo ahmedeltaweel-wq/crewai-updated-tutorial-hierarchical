@@ -152,13 +152,12 @@ def run_customer_service_workflow(request_text):
         compile_task = tasks.compile_service_report_task(
             service_coordinator, [receive_task, billing_task, technical_task], save_service_report)
         
-        # Form the crew (optimized with memory and caching)
+        # Form the crew (optimized with caching)
         update_agent_status('service_coordinator', 'working', 'Forming service team...', 80)
         crew = Crew(
             agents=[call_receiver, billing_specialist, technical_support, service_coordinator],
             tasks=[receive_task, billing_task, technical_task, compile_task],
             process=Process.sequential,
-            memory=True,   # Enable memory for context
             cache=True,    # Cache repeated queries
             verbose=True
         )
